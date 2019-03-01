@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .slider {
+            width: 400px;
+            height: 600px;
+            background: lightcoral;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        .wrapper {
+            width: 9999px;
+            height: 100%;
+            position: absolute;
+        }
+
+        .wrapper>img {
+            flex: 1;
+            width: 400px;
+            height: 100%;
+            float: left;
+        }
+
+        .btn {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background: rgba(255, 255, 255, .5);
+            line-height: 40px;
+            font-size: 16px;
+            text-align: center;
+            vertical-align: middle;
+            top: calc(50% - 20px);
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            right: 0;
+        }
+
+        .menu {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, .5);
+            height: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .msg {
+            position: absolute;
+            bottom: 105px;
+            background: rgba(0, 0, 0, .5);
+            height: 30px;
+            width: 100%;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .menu>div {
+            width: 60px;
+            height: 90px;
+            background: rgba(0, 0, 0, 1);
+        }
+
+        .menu img {
+            width: 100%;
+            height: 100%;
+            opacity: .6;
+        }
+
+        .menu img:hover {
+            opacity: 1 !important;
+        }
+
+        .active {
+            border: lightcoral 2px solid;
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slider">
+        <div class="wrapper">
+            <!-- <img src="" alt=""> -->
+        </div>
+        <div class="left btn">
+            < </div> <div class="right btn"> >
+        </div>
+        <div class="msg"></div>
+        <div class="menu"></div>
+    </div>
+    <script>
+        let slideDuration = 500,
+            stopDuration = 2000,
+            slideInterval = 10, //步长
+            index = 0, //图片数
+            direction = -1, //方向系数 left -1 : right 1
+            dis = 0, //移动距离
+            width = 400, //图片宽度
+            num = 5; //图片数
+        const pics = ['../one.jpg', '../two.jpg', '../three.jpg', '../four.jpg', '../five.jpg'];
+        const msgs = ['1', '2', '3', '4', '5'];
+        let wrapper = document.querySelector('.wrapper');
+        let menu = document.querySelector('.menu');
+        let msg = document.querySelector('.msg');
+        let pre = document.querySelector('.left');
+        let nxt = document.querySelector('.right');
+        //加载图片
+        pics.forEach(val => {
+            let img = document.createElement('img');
+            let smallImg = document.createElement('img');
+            let div = document.createElement('div');
+            img.src = val;
+            smallImg.src = val;
+            wrapper.appendChild(img);
+            div.appendChild(smallImg);
+            menu.appendChild(div);
+        });
+        let smallImgs = document.querySelectorAll('.menu img');
+
+        //自动添加后排图片
+        function addPic() {
+            pics.forEach(val => {
+                let img = document.createElement('img');
+                img.src = val;
+                wrapper.appendChild(img);
+            });
+        }
+        addPic();
+
+        //获取style
+        function getStyle(ele, cssname) {
+            if (window.getComputedStyle) {
+                return window.getComputedStyle(ele)[cssname];
+            } else {
+                return ele.currentStyle[cssname];
+            }
+        }
+        //移动一张图
+        function move(to) {
+            to = to ? to : -width * index; // 目标位置
+            let left = parseInt(getStyle(wrapper, 'left'));
+            let dis = Math.abs(to - left)
+            let step = dis / (slideDuration / slideInterval);
+            let direction = dis / (to - left);
+            let cover = 0;
+            //移动一步
+            let pace = function () {
+                menuActive();
+                let curPos = parseInt(getStyle(wrapper, 'left'));
+                if (cover + step < dis) {
+                    wrapper.style.left = curPos + direction * step + 'px';
+                    cover += step;
+                } else {
+                    wrapper.style.left = to + 'px';
+                    if (index == num) {
+                        index = 0;
+                        wrapper.style.left = 0 + 'px';
+                    }
+                    clearInterval(pacer);
+                }
+            }
+            pacer = setInterval(pace, slideInterval);
+        }
+        //menu.active
+        function menuActive() {
+            let a = index == 5 ? 0 : index;
+            smallImgs.forEach((val, i) => {
+                val.className = i == a ? 'active' : '';
+            });
+            msg.innerHTML = msgs[a];
+        }
+        //自动
+        function auto() {
+            menuActive();
+            play = setInterval(() => {
+                index++;
+                move();
+            }, stopDuration);
+        }
+
+        nxt.onclick = function (e) {
+            clearInterval(play);
+            index++;
+            move();
+            auto();
+        }
+        pre.onclick = function () {
+            clearInterval(play);
+            index--;
+            if (index == -1) {
+                index = num - 1;
+                wrapper.style.left = -num * width + 'px';
+                dis = -num * width;
+            }
+            move();
+            auto();
+        }
+
+        smallImgs.forEach((val, i) => {
+            val.onclick = function () {
+                clearInterval(play);
+                index = i;
+                move();
+                auto();
+            }
+        })
+        auto();
+    </script>
+</body>
+
+</html>

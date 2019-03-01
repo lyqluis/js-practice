@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .wrapper {
+            width: 200px;
+        }
+
+        .slider {
+            width: 200px;
+            height: 300px;
+            background: lightcoral;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        .imgs {
+            width: 9999px;
+            height: 100%;
+            position: absolute;
+        }
+
+        .imgs>img {
+            flex: 1;
+            width: 200px;
+            height: 100%;
+            float: left;
+        }
+
+        .bar {
+            background: lightcoral;
+            margin: 5px 0;
+            width: 70%;
+        }
+
+        .active {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="slider">
+            <div class="imgs"></div>
+        </div>
+    </div>
+    <script>
+        const pics = ['../one.jpg', '../two.jpg', '../three.jpg', '../four.jpg', '../five.jpg'];
+        const msgs = ['1', '2', '3', '4', '5'];
+        let wrapper = document.querySelector('.wrapper'),
+            imgs = document.querySelector('.imgs');
+        let num = pics.length,
+            slideInterval = 10,
+            slideDuration = 500,
+            stopDuration = 2000,
+            width = 200, //图片宽度
+            index = 0;
+        window.onload = () => {
+            //添加图片
+            pics.forEach((el, i) => {
+                let img = document.createElement('img');
+                img.src = el;
+                imgs.appendChild(img);
+            });
+            msgs.forEach((el, i) => {
+                let bar = document.createElement('div');
+                bar.innerHTML = el;
+                bar.className = 'bar';
+                wrapper.appendChild(bar);
+            });
+            imgs.innerHTML += imgs.innerHTML;
+            let bars = document.querySelectorAll('.bar');
+            bars[0].style.width = width + 'px';
+            //
+            //单张图片滑动
+            let move = (to) => {
+                to = to ? to : -index * width; //终点
+                let left = parseInt(window.getComputedStyle(imgs)['left']), //起点
+                    step = width / (slideDuration / slideInterval),
+                    cover = 0, //计步器
+                    dis = Math.abs(to - left), //总路程
+                    direction = dis / (to - left); //方向
+                //一步
+                let pace = () => {
+                    let curPos = parseInt(window.getComputedStyle(imgs)['left']);
+                    if (cover + step < dis) {
+                        imgs.style.left = curPos + direction * step + 'px';
+                        cover += step;
+                    } else {
+                        imgs.style.left = to + 'px';
+                        if (index == num) {
+                            index = 0;
+                            imgs.style.left = 0 + 'px';
+                        }
+                        clearInterval(pacer);
+                    }
+                }
+                pacer = setInterval(pace, slideInterval);
+            }
+            let longBar = () => {
+                let a = index == 5 ? 0 : index,
+                    b = index == 5 ? 4 : index - 1;
+                let right = 200 * .7,
+                    dis = width - right,
+                    step = dis / (slideDuration / slideInterval),
+                    cover = 0;
+                let pace = () => {
+                    let curWidth = parseFloat(window.getComputedStyle(bars[a])['width']);
+                    let curPreWidth = parseFloat(window.getComputedStyle(bars[b])['width']);
+                    if (cover + step < dis) {
+                        bars[a].style.width = curWidth + step + 'px';
+                        bars[b].style.width = curPreWidth - step + 'px';
+                        cover += step;
+                    } else {
+                        bars[a].style.width = width + 'px';
+                        bars[b].style.width = right + 'px';
+                        clearInterval(msg);
+                    }
+                }
+                msg = setInterval(pace, slideInterval);
+            }
+            let auto = () => {
+                play = setInterval(() => {
+                    index++;
+                    move();
+                    longBar();
+                }, stopDuration);
+            }
+            auto();
+        }
+    </script>
+</body>
+
+</html>

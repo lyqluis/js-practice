@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .pic-wrapper {
+            width: 400px;
+            height: 500px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pic-wrapper>img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 0;
+            height: 100px;
+            width: 100%;
+            background: rgba(255, 255, 255, .5);
+            font-size: 30px;
+            text-align: center;
+            line-height: 100px;
+        }
+
+        .btn-wrapper {
+            position: absolute;
+            right: 0;
+            top: 10px;
+            width: 50px;
+        }
+
+        .btn {
+            width: 50px;
+            height: 50px;
+            background: rgb(255, 255, 255);
+            margin-bottom: 20px;
+            float: right;
+            font-size: 20px;
+            line-height: 50px;
+            text-align: center;
+            opacity: .5;
+        }
+
+        .btn:hover {
+            width: 80px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pic-wrapper">
+        <img src="../one.jpg" alt="pic">
+        <div class="bottom">
+            你好
+        </div>
+        <div class="btn-wrapper">
+            <div class="btn">a</div>
+            <div class="btn">b</div>
+            <div class="btn">c</div>
+            <div class="btn">d</div>
+        </div>
+    </div>
+    <script>
+        const pics = ['../one.jpg', '../two.jpg', '../three.jpg', '../four.jpg', ];
+        const colors = ['red', 'green', 'blue', 'yellow'];
+        let btns = document.querySelectorAll('.btn');
+        let bottom = document.querySelector('.bottom');
+        let img = document.querySelector('img');
+        img.addEventListener('click', (e) => {
+            bottom.innerHTML = '你好';
+        });
+        for (let i = 0, len = btns.length; i < len; i++) {
+            btns[i].addEventListener('mouseover', (e) => {
+                e = window.event || e;
+                let target = e.target || event.srcElement;
+                target.style.backgroundColor = colors[i];
+            });
+            btns[i].addEventListener('mouseout', (e) => {
+                e = window.event || e;
+                let target = e.target || event.srcElement;
+                target.style.backgroundColor = 'white';
+            });
+            btns[i].addEventListener('click', (e) => {
+                e = window.event || e;
+                bottom.innerHTML = colors[i];
+                img.src = pics[i];
+            });
+        }
+    </script>
+</body>
+
+</html>

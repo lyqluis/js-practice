@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .numbers{
+            display: flex;
+            flex-wrap: wrap;
+            width: 300px;
+        }
+        .ball {
+            margin: 5px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: lightblue;
+            text-align: center;
+            line-height: 35px;
+            box-shadow:inset -2px -2px 10px 2px blue;
+            opacity: .5;
+        }
+        .ball:hover{
+            opacity: 1;
+        }
+        .active{
+            opacity: 1;        
+        }
+        .price,
+        .result{
+            display: flex;
+            width: 400px;
+        }
+        .red-ball {
+            margin: 5px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: lightcoral;
+            text-align: center;
+            line-height: 35px;
+            box-shadow:inset -2px -2px 10px 2px red;
+            opacity: .8;
+        }
+        .yellow-ball {
+            margin: 5px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: lightyellow;
+            text-align: center;
+            line-height: 35px;
+            box-shadow:inset -2px -2px 10px 2px orange;
+            opacity: .8;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="block">
+            <div class="numbers"></div>
+            <p>添加投注数量<input type="number">注</p>
+            <button class="auto">机选</button>
+            <button class="ok">投注</button>
+        </div>
+        <div class="right">
+            <p>选号结果</p>
+            <div class="result"></div>
+            <button class="open">开奖</button>
+            <button class="close">取消</button>
+            <p>开奖结果</p>
+            <div class='price'></div>
+            <p>开奖结信息</p>
+            <div class='info'></div>
+        </div>
+        <script>
+            let sltNum = [];
+            let openNum = [];
+            let num = 0;
+            let autoBtn = document.querySelector('.auto');
+            let okBtn = document.querySelector('.ok');
+            let openBtn = document.querySelector('.open');
+            let closeBtn = document.querySelector('.close');
+            let info = document.querySelector('.info');
+            //随机数
+            function randomNum(min, max) {
+                let range = max - min;
+                let randomFloat = Math.random();
+                return (min + Math.round(randomFloat * range));
+            }
+            window.onload = () => {
+                for (let i = 0; i < 31; i++) {
+                    let div = document.createElement('div');
+                    let numbers = document.querySelector('.numbers');
+                    div.innerHTML = i + 1;
+                    div.className = 'ball';
+                    numbers.appendChild(div);
+                    let num = i + 1;
+                    div.onclick = () => {
+                        let index = sltNum.indexOf(num);
+                        if (index === -1 && sltNum.length < 7) {
+                            sltNum.push(num);
+                            div.className = 'ball active';
+                        } else {
+                            if (index !== -1) {
+                                sltNum.splice(index, 1);
+                            }
+                            div.className = 'ball';
+                        }
+                    }
+                }
+                for (let i = 0; i < 7; i++) {
+                    let div = document.createElement('div');
+                    let result = document.querySelector('.result');
+                    div.className = 'yellow-ball';
+                    result.appendChild(div);
+                }
+                for (let i = 0; i < 7; i++) {
+                    let div = document.createElement('div');
+                    let result = document.querySelector('.price');
+                    div.className = 'red-ball';
+                    result.appendChild(div);
+                }
+                let auto = (arr) => {
+                    if (arr.length < 7) {
+                        let r = randomNum(1, 31);
+                        if (arr.indexOf(r) === -1) {
+                            arr.push(r);
+                        }
+                        auto(arr);
+                    }
+                }
+                let openMsg = () => {
+                    let same = 0;
+                    let money = 0;
+                    openNum.forEach((el, i) => {
+                        if (sltNum.indexOf(el) !== -1) {
+                            same++;
+                        }
+                    });
+                    switch (same) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                            return '很遗憾，没中奖！'
+                        case 4:
+                            money = num * 5;
+                            return '恭喜中奖！<br>奖金等级：四等奖！奖金额度：5元<br>' + '总奖金：¥' + money
+                        case 5:
+                            money = num * 10;
+                            return '恭喜中奖！<br>奖金等级：三等奖！奖金额度：10元<br>' + '总奖金：¥' + money
+                        case 6:
+                            money = num * 20;
+                            return '恭喜中奖！<br>奖金等级：二等奖！奖金额度：20元<br>' + '总奖金：¥' + money
+                        case 7:
+                            money = num * 50;
+                            return '恭喜中奖！<br>奖金等级：一等奖！奖金额度：50元<br>' + '总奖金：¥' + money
+                    }
+                }
+                autoBtn.onclick = () => {
+                    sltNum = [];
+                    auto(sltNum);
+                    console.log(sltNum);
+                    let balls = document.querySelectorAll('.ball');
+                    balls.forEach(el => {
+                        el.className = 'ball';
+                    });
+                    sltNum.forEach((el, i) => {
+                        balls[el - 1].className = 'ball active';
+                    });
+                };
+                okBtn.onclick = () => {
+                    let results = document.querySelectorAll('.yellow-ball');
+                    sltNum.forEach((el, i) => {
+                        results[i].innerHTML = el;
+                    });
+                    let ipt = document.querySelector('input');
+                    num = ipt.innerText;
+                }
+                closeBtn.onclick = () => {
+                    sltNum = [];
+                    let results = document.querySelectorAll('.yellow-ball');
+                    sltNum.forEach((el, i) => {
+                        results[i].innerHTML = '';
+                    });
+                }
+                openBtn.onclick = () => {
+                    let openNum = [];
+                    auto(openNum);
+                    let results = document.querySelectorAll('.red-ball');
+                    openNum.forEach((el, i) => {
+                        results[i].innerHTML = el;
+                    });
+                    info.innerHTML = openMsg();
+                }
+            }
+        </script>
+</body>
+
+</html>
